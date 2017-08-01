@@ -1,0 +1,6 @@
+*.pyc
+*.swp
+*.tfrecord
+/checkpoints
+/__pycache__
+/summarylog
