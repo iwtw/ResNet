@@ -30,15 +30,23 @@ def fully_connected( inputs , outputs_dim , he_init = True , activation_fn = tf.
     weights_regularizer = layers.l2_regularizer( scale = regularization_scale )
     return layers.fully_connected( x , outputs_dim , weights_initializer =  weights_initializer , activation_fn = activation_fn  , weights_regularizer = weights_regularizer )
 def basic_block(inputs , outputs_dim , kernel_size , stride  , he_init = True , activation_fn = tf.nn.relu , regularization_scale = 0.0 ):
-    weights_regularizer = layers.l2_regularizer( scale  = regularization_scale  )
     f = conv2d( inputs , outputs_dim = outputs_dim , kernel_size = kernel_size , stride = stride , he_init = True , activation_fn = activation_fn  , regularization_scale = regularization_scale )
+    f = layers.batch_norm( f , activation_fn = None )
     f = conv2d( f , outputs_dim = outputs_dim , kernel_size = kernel_size , stride = 1 , he_init = False , activation_fn = None , regularization_scale = regularization_scale )
+    f = layers.batch_norm( f , activation_fn = None )
 
-    #print( np.prod( f.shape[1:] ))
     if outputs_dim == f.shape[-1].value and stride == 1 :
-        #shortcut = fully_connected( layers.flatten( inputs ) , outputs_dim = np.prod( f.shape.dims[1:] ).value , he_init = False , activation_fn = None , regularization_scale = regularization_scale ) 
-        #shortcut = tf.reshape( shortcut , tf.shape( f ) )
-        #shortcut = layers.max_pool2d( inputs , kernel_size = 1 , stride = stride  )
+        shortcut = inputs
+    else:
+        shortcut = conv2d( inputs , outputs_dim = outputs_dim , kernel_size = 1 , stride = stride , he_init = False , activation_fn = None , regularization_scale = regularization_scale ) 
+    return tf.nn.relu( shortcut + f )
+def bottleneck_block(inputs , outputs_dim , intermediate_dim , kernel_size , stride , he_init = True , activation_fn = tf.nn.relu , regularization_scale = 0.0 ):
+    f = conv2d( inputs , outputs_dim = intermediate_dim , kernel_size = 1 , stride = stride , he_init = True , activation_fn = activation_fn  , regularization_scale = regularization_scale )
+    f = conv2d( f , outputs_dim = intermediate_dim , kernel_size = kernel_size , stride = 1 , he_init = True , activation_fn = activation_fn , regularization_scale = regularization_scale )
+    f = conv2d( f , outputs_dim = outputs_dim , kernel_size = 1 , stride = 1 , he_init = False , activation_fn = None , regularization_scale = regularization_scale )
+
+
+    if outputs_dim == f.shape[-1].value and stride == 1 :
         shortcut = inputs
     else:
         shortcut = conv2d( inputs , outputs_dim = outputs_dim , kernel_size = 1 , stride = stride , he_init = False , activation_fn = None , regularization_scale = regularization_scale ) 
