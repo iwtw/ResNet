@@ -39,7 +39,7 @@ def basic_block(inputs , outputs_dim , kernel_size , stride  , he_init = True , 
         shortcut = inputs
     else:
         shortcut = conv2d( inputs , outputs_dim = outputs_dim , kernel_size = 1 , stride = stride , he_init = False , activation_fn = None , regularization_scale = regularization_scale ) 
-    return tf.nn.relu( shortcut + f )
+    return tf.nn.relu( 0.1*shortcut + f )
 def bottleneck_block(inputs , outputs_dim , intermediate_dim , kernel_size , stride , he_init = True , activation_fn = tf.nn.relu , regularization_scale = 0.0 ):
     f = conv2d( inputs , outputs_dim = intermediate_dim , kernel_size = 1 , stride = stride , he_init = True , activation_fn = activation_fn  , regularization_scale = regularization_scale )
     f = conv2d( f , outputs_dim = intermediate_dim , kernel_size = kernel_size , stride = 1 , he_init = True , activation_fn = activation_fn , regularization_scale = regularization_scale )
@@ -50,4 +50,4 @@ def bottleneck_block(inputs , outputs_dim , intermediate_dim , kernel_size , str
         shortcut = inputs
     else:
         shortcut = conv2d( inputs , outputs_dim = outputs_dim , kernel_size = 1 , stride = stride , he_init = False , activation_fn = None , regularization_scale = regularization_scale ) 
-    return tf.nn.relu( shortcut + f )
+    return tf.nn.relu( 0.1*shortcut + f )
